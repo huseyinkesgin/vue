@@ -75,22 +75,27 @@ async function handleSave(cityData: Partial<City>) {
         appStore.startLoading('saveCity')
         let savedCity: City | undefined
 
-        if (editMode.value && cityData.id) {
-            savedCity = await cityStore.updateCity(cityData.id, cityData)
-            toast.show('Şehir başarıyla güncellendi', 'success')
+        if (editMode.value && selectedCity.value) {
+            savedCity = await cityStore.updateCity(selectedCity.value.id, {
+                code: cityData.code,
+                name: cityData.name,
+                description: cityData.description,
+                isActive: cityData.isActive
+            })
+            toast.show(`${cityData.name} başarıyla güncellendi`, 'success')
         } else {
-            savedCity = await cityStore.createCity(cityData)
-            toast.show('Şehir başarıyla eklendi', 'success')
+            const { id, createdAt, updatedAt, ...newCityData } = cityData as City
+            savedCity = await cityStore.createCity(newCityData)
+            toast.show(`${cityData.name} başarıyla eklendi`, 'success')
         }
 
         showModal.value = false
         await cityStore.fetchCities()
 
-        // Kaydedilen şehri bul ve aktif yap
         nextTick(() => {
             const updatedCity = cityStore.cities.find(c => c.code === cityData.code)
             if (updatedCity) {
-                activeRow.value = updatedCity // Aktif satırı güncelle
+                activeRow.value = updatedCity
                 const activeElement = document.querySelector('tr.row-active')
                 if (activeElement instanceof HTMLElement) {
                     activeElement.focus()
@@ -166,7 +171,7 @@ onMounted(async () => {
         <CityModal
             v-model:show="showModal"
             :edit-mode="editMode"
-            :city-data="selectedCity"
+            :city-data="selectedCity || undefined"
             @save="handleSave"
         />
 

@@ -13,6 +13,12 @@ interface Column {
   align?: 'left' | 'center' | 'right'
 }
 
+interface TableSlots {
+  [key: string]: (props: { row?: any }) => any
+}
+
+defineSlots<TableSlots>()
+
 const props = defineProps<{
   columns: Column[]
   data: any[]
@@ -190,13 +196,13 @@ function handleRowSelect(rows: any[]) {
           @row-dblclick="handleRowDblClick"
           @keydown="handleKeyDown"
         >
-          <template
-            v-for="(_, name) in $slots"
-            :key="name"
-            #[name]="slotData"
-          >
-            <slot :name="name" v-bind="slotData" />
-          </template>
+        <template
+          v-for="(name, _) in Object.keys($slots)"
+          :key="name"
+          #[name]="slotData"
+        >
+          <slot :name="name" v-bind="slotData" />
+        </template>
         </BaseTableBody>
 
         <BaseTableFooter v-if="$slots.footer">

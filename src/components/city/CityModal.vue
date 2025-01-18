@@ -32,7 +32,12 @@ const statusOptions = [
 
 watch(() => props.cityData, (newData) => {
   if (newData) {
-    formData.value = { ...newData }
+    formData.value = {
+      code: newData.code,
+      name: newData.name,
+      description: newData.description || '',
+      isActive: newData.isActive
+    }
   } else {
     resetForm()
   }
@@ -64,7 +69,7 @@ function handleSave() {
     @update:model-value="$emit('update:show', $event)"
     @save="handleSave"
     @reset="resetForm"
-    @delete="$emit('delete', cityData)"
+    @delete="cityData && $emit('delete', cityData)"
   >
     <template #default="{ codeInputRef }">
       <form @submit.prevent="handleSave" class="city-form">
@@ -73,7 +78,7 @@ function handleSave() {
           v-model="formData.code"
           label="Kod"
           required
-          :readonly="editMode"
+
         />
 
         <BaseInput

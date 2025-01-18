@@ -42,7 +42,7 @@ export class CityController {
     async update(req: Request, res: Response, next: NextFunction) {
         try {
             const id = Number(req.params.id)
-            const { name, description, isActive } = req.body
+            const { code, name, description, isActive } = req.body
 
             const existingCity = await prisma.city.findUnique({
                 where: { id }
@@ -54,11 +54,7 @@ export class CityController {
 
             const updatedCity = await prisma.city.update({
                 where: { id },
-                data: {
-                    name,
-                    description,
-                    isActive
-                }
+                data: req.body
             })
 
             res.json(updatedCity)
